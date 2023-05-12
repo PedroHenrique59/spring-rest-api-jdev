@@ -78,13 +78,13 @@ public class JWTTokenAutenticacaoService {
 
                 if (usuario != null) {
 
-                    if (tokenLimpo.equalsIgnoreCase(usuario.getToken())) {
+                    //if (tokenLimpo.equalsIgnoreCase(usuario.getToken())) {
 
-                        return new UsernamePasswordAuthenticationToken(
-                                usuario.getLogin(),
-                                usuario.getSenha(),
-                                usuario.getAuthorities());
-                    }
+                    return new UsernamePasswordAuthenticationToken(
+                            usuario.getLogin(),
+                            usuario.getSenha(),
+                            usuario.getAuthorities());
+                    // }
                 }
             }
         }
