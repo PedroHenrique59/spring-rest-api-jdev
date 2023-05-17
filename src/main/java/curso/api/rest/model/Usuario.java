@@ -40,7 +40,7 @@ public class Usuario implements UserDetails {
 	
 	private String nome;
 	
-	@CPF(message= "Cpf inálido")
+	@CPF(message= "Cpf Inválido")
 	private String cpf;
 
 	@OneToMany(mappedBy="usuario", orphanRemoval = true, cascade = CascadeType.ALL, fetch =FetchType.LAZY)
@@ -55,7 +55,7 @@ public class Usuario implements UserDetails {
 	
 	inverseJoinColumns = @JoinColumn (name = "role_id", referencedColumnName = "id", table = "role", unique = false, updatable = false,
 	   foreignKey = @ForeignKey (name="role_fk", value = ConstraintMode.CONSTRAINT)))
-	private List<Role> roles; /*Os papeis ou acessos*/
+	private List<Role> roles = new ArrayList<>(); /*Os papeis ou acessos*/
 	
 	
 	private String token = "";
@@ -145,7 +145,6 @@ public class Usuario implements UserDetails {
 	/*São os acessos do usuário ROLE_ADMIN OU ROLE_VISITANTE*/
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-
 		return roles;
 	}
 

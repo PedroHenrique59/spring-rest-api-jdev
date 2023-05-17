@@ -40,6 +40,5 @@ public class CursospringrestapiApplication implements WebMvcConfigurer {
 		/*Liberando o mapeamento de usuario para todas as origens*/
 		
 	}
-
 }
 
