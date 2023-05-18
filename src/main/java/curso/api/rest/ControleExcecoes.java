@@ -32,10 +32,12 @@ public class ControleExcecoes extends ResponseEntityExceptionHandler {
             for (ObjectError objectError : list) {
                 msg += objectError.getDefaultMessage() + "\n";
             }
-        } else {
-            msg = ex.getMessage();
         }
-        return new ResponseEntity<>(msg, headers, status);
+        ObjetoError objetoError = new ObjetoError();
+        objetoError.setCode(status.value() + " ==> " + status.getReasonPhrase());
+        objetoError.setError(msg);
+
+        return new ResponseEntity<>(objetoError, headers, status);
     }
 
     @ExceptionHandler({DataIntegrityViolationException.class, ConstraintViolationException.class, PSQLException.class, SQLException.class})
