@@ -45,8 +45,7 @@ public class Usuario implements UserDetails {
 
 	@OneToMany(mappedBy="usuario", orphanRemoval = true, cascade = CascadeType.ALL, fetch =FetchType.LAZY)
 	private List<Telefone> telefones = new ArrayList<Telefone>();
-	
-	
+
 	@OneToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "usuarios_role", uniqueConstraints = @UniqueConstraint (
 			         columnNames = {"usuario_id","role_id"}, name = "unique_role_user"), 
