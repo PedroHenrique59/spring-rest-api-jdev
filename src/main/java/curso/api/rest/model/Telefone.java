@@ -1,10 +1,6 @@
 package curso.api.rest.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -18,7 +14,7 @@ public class Telefone {
 	private String numero;
 
 	@JsonIgnore
-	@org.hibernate.annotations.ForeignKey(name = "usuario_id")
+	@JoinColumn(name = "usuario_id")
 	@ManyToOne(optional = false)
 	private Usuario usuario;
 

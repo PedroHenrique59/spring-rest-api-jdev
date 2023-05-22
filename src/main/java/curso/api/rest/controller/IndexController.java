@@ -1,11 +1,15 @@
 package curso.api.rest.controller;
 
 import curso.api.rest.model.Usuario;
+import curso.api.rest.repositoy.TelefoneRepository;
 import curso.api.rest.repositoy.UsuarioRepository;
 import curso.api.rest.service.ImplementacaoUserDetailsSercice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,6 +25,9 @@ public class IndexController {
 
     @Autowired /* de fosse CDI seria @Inject*/
     private UsuarioRepository usuarioRepository;
+
+    @Autowired /* de fosse CDI seria @Inject*/
+    private TelefoneRepository telefoneRepository;
 
     @Autowired
     private ImplementacaoUserDetailsSercice implementacaoUserDetailsSercice;
@@ -54,17 +61,30 @@ public class IndexController {
         return "ok";
     }
 
-    /*Vamos supor que o carregamento de usuário seja um processo lento
-     * e queremos controlar ele com cache para agilizar o processo*/
     @GetMapping(value = "/", produces = "application/json")
     @CacheEvict(value = "cacheusuarios", allEntries = true)
     @CachePut("cacheusuarios")
-    public ResponseEntity<List<Usuario>> usuario() throws InterruptedException {
+    public ResponseEntity<Page<Usuario>> usuario() throws InterruptedException {
 
-        List<Usuario> list = (List<Usuario>) usuarioRepository.findAll();
+        PageRequest page = PageRequest.of(0, 2, Sort.by("nome"));
 
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        Page<Usuario> lista = usuarioRepository.findAll(page);
+
+        return new ResponseEntity<>(lista, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/page/{pagina}", produces = "application/json")
+    @CacheEvict(value = "cacheusuarios", allEntries = true)
+    @CachePut("cacheusuarios")
+    public ResponseEntity<Page<Usuario>> usuarioPagina(@PathVariable("pagina") int pagina) throws InterruptedException {
+
+        PageRequest page = PageRequest.of(pagina, 2, Sort.by("nome"));
+
+        Page<Usuario> lista = usuarioRepository.findAll(page);
+
+        return new ResponseEntity<>(lista, HttpStatus.OK);
+    }
+
 
     @GetMapping(value = "/usuarioPorNome/{nome}", produces = "application/json")
     @CachePut("cacheusuarios")
@@ -130,4 +150,11 @@ public class IndexController {
         return new ResponseEntity("id user :" + iduser + " idvenda :" + idvenda, HttpStatus.OK);
 
     }
+
+    @DeleteMapping(value = "/excluirTelefone/{id}", produces = "application/text")
+    public String excluirTelefone(@PathVariable("id") Long id) {
+        telefoneRepository.deleteById(id);
+        return "Ok";
+    }
+
 }
