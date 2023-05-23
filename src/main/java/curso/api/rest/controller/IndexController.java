@@ -85,12 +85,37 @@ public class IndexController {
         return new ResponseEntity<>(lista, HttpStatus.OK);
     }
 
-
     @GetMapping(value = "/usuarioPorNome/{nome}", produces = "application/json")
     @CachePut("cacheusuarios")
-    public ResponseEntity<List<Usuario>> obterUsuarioPorNome(@PathVariable("nome") String nome) throws InterruptedException {
+    public ResponseEntity<Page<Usuario>> obterUsuarioPorNome(@PathVariable("nome") String nome) throws InterruptedException {
 
-        List<Usuario> list = usuarioRepository.findUsuariosByNomeContainsIgnoreCase(nome);
+        PageRequest page;
+        Page<Usuario> list;
+
+        if (nome == null || nome.trim().isEmpty() || nome.equalsIgnoreCase("undefined")) {
+            page = PageRequest.of(0, 2, Sort.by("nome"));
+            list = usuarioRepository.findAll(page);
+        } else {
+            page = PageRequest.of(0, 2, Sort.by("nome"));
+            list = usuarioRepository.findUsuariosByNomeContainsIgnoreCase(nome, page);
+        }
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/usuarioPorNome/{nome}/page/{page}", produces = "application/json")
+    @CachePut("cacheusuarios")
+    public ResponseEntity<Page<Usuario>> obterUsuarioPorNomePage(@PathVariable("nome") String nome, @PathVariable("page") int page) throws InterruptedException {
+
+        PageRequest pageRequest;
+        Page<Usuario> list;
+
+        if (nome == null || nome.trim().isEmpty() || nome.equalsIgnoreCase("undefined")) {
+            pageRequest = PageRequest.of(page, 2, Sort.by("nome"));
+            list = usuarioRepository.findAll(pageRequest);
+        } else {
+            pageRequest = PageRequest.of(page, 2, Sort.by("nome"));
+            list = usuarioRepository.findUsuariosByNomeContainsIgnoreCase(nome, pageRequest);
+        }
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
