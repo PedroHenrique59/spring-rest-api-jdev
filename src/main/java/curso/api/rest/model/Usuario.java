@@ -143,7 +143,7 @@ public class Usuario implements UserDetails {
 
 	/*São os acessos do usuário ROLE_ADMIN OU ROLE_VISITANTE*/
 	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
+	public Collection<Role> getAuthorities() {
 		return roles;
 	}
 
