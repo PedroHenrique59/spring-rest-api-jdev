@@ -1,5 +1,6 @@
 package curso.api.rest.controller;
 
+import curso.api.rest.model.Profissao;
 import curso.api.rest.model.Usuario;
 import curso.api.rest.repositoy.TelefoneRepository;
 import curso.api.rest.repositoy.UsuarioRepository;
@@ -16,7 +17,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 
 @RestController /* Arquitetura REST */
@@ -46,7 +46,13 @@ public class IndexController {
     @CachePut("cacheuser")
     public ResponseEntity<Usuario> init(@PathVariable(value = "id") Long id) {
         Optional<Usuario> usuario = usuarioRepository.findById(id);
-        return new ResponseEntity<>(usuario.get(), HttpStatus.OK);
+        if (usuario.isPresent()) {
+            if (usuario.get().getProfissao() == null) {
+                usuario.get().setProfissao(new Profissao());
+            }
+            return new ResponseEntity<>(usuario.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping(value = "/{id}", produces = "application/text")

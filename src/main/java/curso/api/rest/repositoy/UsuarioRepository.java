@@ -32,6 +32,11 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Page<Usuario> findUsuariosByNomeContainsIgnoreCase(String nome, Pageable page);
 
+    @Transactional
+    @Modifying
+    @Query(value = "update usuario set senha = ?1 where id = ?2", nativeQuery = true)
+    void updateSenha(String senha, Long codUser);
+
     /* Método para buscar um usuário do banco que contenha parte do nome passado como parametro */
     default Page<Usuario> findUsuarioByNamePage(String nome, PageRequest pageRequest) {
         Usuario usuario = new Usuario();

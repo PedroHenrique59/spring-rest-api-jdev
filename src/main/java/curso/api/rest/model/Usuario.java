@@ -1,5 +1,6 @@
 package curso.api.rest.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -51,6 +52,11 @@ public class Usuario implements UserDetails {
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy")
     private Date dataNascimento;
+
+    @ManyToOne()
+    private Profissao profissao;
+
+    private BigDecimal salario;
 
     private String token = "";
 
@@ -116,6 +122,22 @@ public class Usuario implements UserDetails {
 
     public void setDataNascimento(Date dataNascimento) {
         this.dataNascimento = dataNascimento;
+    }
+
+    public Profissao getProfissao() {
+        return profissao;
+    }
+
+    public void setProfissao(Profissao profissao) {
+        this.profissao = profissao;
+    }
+
+    public BigDecimal getSalario() {
+        return salario;
+    }
+
+    public void setSalario(BigDecimal salario) {
+        this.salario = salario;
     }
 
     @Override
