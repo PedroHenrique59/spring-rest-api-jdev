@@ -5,6 +5,8 @@ import curso.api.rest.model.Usuario;
 import curso.api.rest.repositoy.TelefoneRepository;
 import curso.api.rest.repositoy.UsuarioRepository;
 import curso.api.rest.service.ImplementacaoUserDetailsSercice;
+import curso.api.rest.service.RelatorioService;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Optional;
 
@@ -31,6 +34,9 @@ public class IndexController {
 
     @Autowired
     private ImplementacaoUserDetailsSercice implementacaoUserDetailsSercice;
+
+    @Autowired
+    private RelatorioService relatorioService;
 
     /* Serviço RESTful */
     @GetMapping(value = "/{id}/codigovenda/{venda}", produces = "application/json")
@@ -186,6 +192,13 @@ public class IndexController {
     public String excluirTelefone(@PathVariable("id") Long id) {
         telefoneRepository.deleteById(id);
         return "Ok";
+    }
+
+    @GetMapping(value = "/relatorio", produces = "application/text")
+    public ResponseEntity<String> downloadRelatorio(HttpServletRequest request) throws Exception {
+        byte[] pdf = relatorioService.gerarRelatorio("relatorio-usuario", request.getServletContext());
+        String base64Pdf = "data:application/pdf;base64," + Base64.encodeBase64String(pdf);
+        return new ResponseEntity<>(base64Pdf, HttpStatus.OK);
     }
 
 }
