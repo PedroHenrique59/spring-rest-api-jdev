@@ -2,6 +2,7 @@ package curso.api.rest.controller;
 
 import curso.api.rest.model.Profissao;
 import curso.api.rest.model.Usuario;
+import curso.api.rest.model.UsuarioReport;
 import curso.api.rest.repositoy.TelefoneRepository;
 import curso.api.rest.repositoy.UsuarioRepository;
 import curso.api.rest.service.ImplementacaoUserDetailsSercice;
@@ -20,6 +21,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController /* Arquitetura REST */
@@ -196,9 +201,25 @@ public class IndexController {
 
     @GetMapping(value = "/relatorio", produces = "application/text")
     public ResponseEntity<String> downloadRelatorio(HttpServletRequest request) throws Exception {
-        byte[] pdf = relatorioService.gerarRelatorio("relatorio-usuario", request.getServletContext());
+        byte[] pdf = relatorioService.gerarRelatorio("relatorio-usuario", new HashMap<>(), request.getServletContext());
         String base64Pdf = "data:application/pdf;base64," + Base64.encodeBase64String(pdf);
         return new ResponseEntity<>(base64Pdf, HttpStatus.OK);
     }
 
+    @PostMapping(value = "/relatorio/", produces = "application/text")
+    public ResponseEntity<String> downloadRelatorioParam(HttpServletRequest request, @RequestBody UsuarioReport usuarioReport) throws Exception {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat dateFormatParam = new SimpleDateFormat("yyyy-MM-dd");
+
+        String dataInicio = dateFormatParam.format(dateFormat.parse(usuarioReport.getDataInicio()));
+        String dataFim = dateFormatParam.format(dateFormat.parse(usuarioReport.getDataFim()));
+
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("DATA_INICIO", usuarioReport.getDataInicio());
+        parametros.put("DATA_FIM", usuarioReport.getDataFim());
+
+        byte[] pdf = relatorioService.gerarRelatorio("relatorio-usuario-parametro", parametros, request.getServletContext());
+        String base64Pdf = "data:application/pdf;base64," + Base64.encodeBase64String(pdf);
+        return new ResponseEntity<>(base64Pdf, HttpStatus.OK);
+    }
 }
