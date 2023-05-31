@@ -2,6 +2,7 @@ package curso.api.rest.controller;
 
 import curso.api.rest.model.Profissao;
 import curso.api.rest.model.Usuario;
+import curso.api.rest.model.UsuarioChart;
 import curso.api.rest.model.UsuarioReport;
 import curso.api.rest.repositoy.TelefoneRepository;
 import curso.api.rest.repositoy.UsuarioRepository;
@@ -16,16 +17,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RestController /* Arquitetura REST */
 @RequestMapping(value = "/usuario")
@@ -42,6 +41,9 @@ public class IndexController {
 
     @Autowired
     private RelatorioService relatorioService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     /* Serviço RESTful */
     @GetMapping(value = "/{id}/codigovenda/{venda}", produces = "application/json")
@@ -222,4 +224,21 @@ public class IndexController {
         String base64Pdf = "data:application/pdf;base64," + Base64.encodeBase64String(pdf);
         return new ResponseEntity<>(base64Pdf, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/grafico", produces = "application/json")
+    public ResponseEntity<UsuarioChart> montarGrafico() {
+        UsuarioChart usuarioChart = new UsuarioChart();
+
+        List<String> resultado = jdbcTemplate.queryForList("select array_agg (nome) from usuario where salario > 0 union all select cast(array_agg (salario) as character varying[]) from usuario where salario > 0", String.class);
+
+        if (!resultado.isEmpty()) {
+            String nomes = resultado.get(0).replaceAll("\\{", "").replaceAll("\\}", "");
+            String salario = resultado.get(1).replaceAll("\\{", "").replaceAll("\\}", "");
+            usuarioChart.setNome(nomes);
+            usuarioChart.setSalario(salario);
+        }
+
+        return new ResponseEntity<>(usuarioChart, HttpStatus.OK);
+    }
+
 }
