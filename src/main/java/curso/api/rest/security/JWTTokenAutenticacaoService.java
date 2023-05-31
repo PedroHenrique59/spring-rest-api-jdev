@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -63,30 +64,35 @@ public class JWTTokenAutenticacaoService {
 
         String token = request.getHeader(HEADER_STRING);
 
-        if (token != null) {
+        try {
+            if (token != null) {
 
-            String tokenLimpo = token.replace(TOKEN_PREFIX, "").trim();
+                String tokenLimpo = token.replace(TOKEN_PREFIX, "").trim();
 
-            /*Faz a validação do token do usuário na requisição*/
-            String user = Jwts.parser().setSigningKey(SECRET) /*Bearer 87878we8we787w8e78w78e78w7e87w*/
-                    .parseClaimsJws(tokenLimpo) /*87878we8we787w8e78w78e78w7e87w*/
-                    .getBody().getSubject(); /*João Silva*/
-            if (user != null) {
+                /*Faz a validação do token do usuário na requisição*/
+                String user = Jwts.parser().setSigningKey(SECRET) /*Bearer 87878we8we787w8e78w78e78w7e87w*/
+                        .parseClaimsJws(tokenLimpo) /*87878we8we787w8e78w78e78w7e87w*/
+                        .getBody().getSubject(); /*João Silva*/
+                if (user != null) {
 
-                Usuario usuario = ApplicationContextLoad.getApplicationContext()
-                        .getBean(UsuarioRepository.class).findUsuarioByLogin(user);
+                    Usuario usuario = ApplicationContextLoad.getApplicationContext()
+                            .getBean(UsuarioRepository.class).findUsuarioByLogin(user);
 
-                if (usuario != null) {
+                    if (usuario != null) {
 
-                    //if (tokenLimpo.equalsIgnoreCase(usuario.getToken())) {
+                        //if (tokenLimpo.equalsIgnoreCase(usuario.getToken())) {
 
-                    return new UsernamePasswordAuthenticationToken(
-                            usuario.getLogin(),
-                            usuario.getSenha(),
-                            usuario.getAuthorities());
-                    // }
+                        return new UsernamePasswordAuthenticationToken(
+                                usuario.getLogin(),
+                                usuario.getSenha(),
+                                usuario.getAuthorities());
+                        // }
+                    }
                 }
             }
+        } catch (ExpiredJwtException e) {
+            liberacaoCors(response);
+            return null;
         }
 
         liberacaoCors(response);
