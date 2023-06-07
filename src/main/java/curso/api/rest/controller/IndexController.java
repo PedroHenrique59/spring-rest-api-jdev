@@ -33,7 +33,7 @@ public class IndexController {
     @Autowired /* de fosse CDI seria @Inject*/
     private UsuarioRepository usuarioRepository;
 
-    @Autowired /* de fosse CDI seria @Inject*/
+    @Autowired
     private TelefoneRepository telefoneRepository;
 
     @Autowired
@@ -45,15 +45,6 @@ public class IndexController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    /* Serviço RESTful */
-    @GetMapping(value = "/{id}/codigovenda/{venda}", produces = "application/json")
-    public ResponseEntity<Usuario> relatorio(@PathVariable(value = "id") Long id, @PathVariable(value = "venda") Long venda) {
-        Optional<Usuario> usuario = usuarioRepository.findById(id);
-        /*o retorno seria um relatorio*/
-        return new ResponseEntity<>(usuario.get(), HttpStatus.OK);
-    }
-
-    /* Serviço RESTful */
     @GetMapping(value = "/{id}", produces = "application/json")
     @CacheEvict(value = "cacheuser", allEntries = true)
     @CachePut("cacheuser")
@@ -70,12 +61,6 @@ public class IndexController {
 
     @DeleteMapping(value = "/{id}", produces = "application/text")
     public String delete(@PathVariable("id") Long id) {
-        usuarioRepository.deleteById(id);
-        return "ok";
-    }
-
-    @DeleteMapping(value = "/{id}/venda", produces = "application/text")
-    public String deletevenda(@PathVariable("id") Long id) {
         usuarioRepository.deleteById(id);
         return "ok";
     }
@@ -171,28 +156,6 @@ public class IndexController {
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
 
         return new ResponseEntity<>(usuarioSalvo, HttpStatus.OK);
-    }
-
-    @PutMapping(value = "/{iduser}/idvenda/{idvenda}", produces = "application/json")
-    public ResponseEntity updateVenda(@PathVariable Long iduser,
-                                      @PathVariable Long idvenda) {
-        /*outras rotinas antes de atualizar*/
-
-        //Usuario usuarioSalvo = usuarioRepository.save(usuario);
-
-        return new ResponseEntity("Venda atualzada", HttpStatus.OK);
-    }
-
-
-    @PostMapping(value = "/{iduser}/idvenda/{idvenda}", produces = "application/json")
-    public ResponseEntity cadastrarvenda(@PathVariable Long iduser,
-                                         @PathVariable Long idvenda) {
-
-        /*Aqui seria o processo de venda*/
-        //Usuario usuarioSalvo = usuarioRepository.save(usuario);
-
-        return new ResponseEntity("id user :" + iduser + " idvenda :" + idvenda, HttpStatus.OK);
-
     }
 
     @DeleteMapping(value = "/excluirTelefone/{id}", produces = "application/text")
